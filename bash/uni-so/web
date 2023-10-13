@@ -1,0 +1,22 @@
+#!/bin/bash
+
+URL="https://wykop.pl"
+STATUS=$(curl -o /dev/null --silent --head --write-out '%{http_code}\n' "$URL")
+
+case "$STATUS" in
+200)
+	notify-send "$URL online"
+	;;
+301 | 302)
+	notify-send "$URL redireciton"
+	;;
+4*)
+	notify-send "$URL prob my fault"
+	;;
+5*)
+	notify-send "$URL server down"
+	;;
+*)
+	notify-send "$URL $STATUS"
+	;;
+esac

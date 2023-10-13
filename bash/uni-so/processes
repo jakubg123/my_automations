@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Exercise 11
+# Write to a file being first parameter
+# list of all processes working longer
+# than second parameter being minutes.
+# Ignore processes which have month/day.
+# Format: PID PROCESS_NAME STIME OWNER
+liczba='^[1-9]*[0-9]+$'
+IFS=$'\n'
+if ! [[ "$2" =~ $liczba ]]; then
+	echo "zly 2 arg"
+	exit 1
+fi
+FILENAME=$1
+rm -rf "$FILENAME"
+MINUTY=$2
+Lista=$(ps -aux | awk '($9 ~ "..:.."){print $2,$11,$9,$1}')
+echo "NUMER_PROCESU NAZWA_PROCESU CZAS_URUCHOMENIA WLASCICIEL"
+for czasy in $Lista; do
+
+	SEKUNDY=$(echo $czasy | cut -d ' ' -f3 | awk -F: '{print ($1 * 3600) + ($2 * 60)}')
+	MINUTYNAS=$(echo $MINUTY | awk '{print ($1 * 60)}')
+	SUMA=$(($SEKUNDY - $MINUTYNAS))
+	if [ $SUMA -gt 0 ]; then
+		echo "$czasy" >>"$FILENAME"
+	fi
+done

@@ -1,0 +1,44 @@
+#!/bin/bash
+if [[ $# -ne 2 ]]; then
+	echo "zla liczba parametrow"
+	exit 1
+fi
+
+file1=$1
+file2=$2
+
+if [[ -e "$file1" || -e "$file2" ]]; then
+	echo "plik/i istnieja"
+	exit 1
+fi
+
+echo "wybierz"
+echo "1. klawiatura"
+echo "2. plik"
+read -p choice
+
+data=""
+
+case $choice in
+1)
+	echo "dane"
+	while IFS= read -r line; do
+		data+="$line"$'\n'
+	done
+	;;
+2)
+	read -p "sciezka pliku do czytania: " filepath
+	data=$(cat "$filepath")
+	;;
+*)
+	exit 1
+	;;
+esac
+
+file1_data=$(echo "$data" | awk 'NR==1,/^\s*$/' | head -n -1)
+file2_data=$(echo "$data" | awk '/^\s*$/ {flag=1; next} flag')
+
+echo "$file1_data" >"$file1"
+echo "$file2_data" >"$file2"
+
+echo "$file1 --- $file2"
