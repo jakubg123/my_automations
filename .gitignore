@@ -1,5 +1,6 @@
 settings.py
 .env
+python/.env
 __pycache__/*
-logs
+python/logs/*
 
