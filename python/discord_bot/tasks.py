@@ -3,7 +3,7 @@ from discord.ext import tasks, commands
 import asyncio
 import datetime
 import settings
-
+import openai
 reminders = []
 intents = discord.Intents.default()
 intents.message_content = True
@@ -100,5 +100,3 @@ async def list_commands(ctx):
     for cmd in bot.commands:
         command_list.append(f"{cmd.name} - {cmd.help}")
     await ctx.send("\n".join(command_list))
-
-
