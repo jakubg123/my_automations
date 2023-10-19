@@ -1,4 +1,5 @@
 import datetime
+from spotify_settings import EMAIL, PASSWORD
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -11,8 +12,6 @@ from bs4 import BeautifulSoup
 
 
 def get_spotify_links(id):
-    EMAIL = 'jakubgniadek87@gmail.com'
-    PASSWORD = '66utJ.$a$/8p-T/'
     chrome_options = Options()
 
     spotify = {
