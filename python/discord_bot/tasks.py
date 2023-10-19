@@ -4,10 +4,16 @@ import asyncio
 import datetime
 import settings
 import openai
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
+
 reminders = []
 intents = discord.Intents.default()
 intents.message_content = True
-
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 bot.remove_command('help')
@@ -100,3 +106,29 @@ async def list_commands(ctx):
     for cmd in bot.commands:
         command_list.append(f"{cmd.name} - {cmd.help}")
     await ctx.send("\n".join(command_list))
+
+
+def get_latest_tweets(username, count=5):
+    chrome_options = webdriver.ChromeOptions()
+    #chrome_options.add_argument("--no-sandbox")
+    #chrome_options.add_argument("--disable-dev-shm-usage")
+
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get(f'https://twitter.com/{username}')
+    driver_wait = WebDriverWait(driver, 30)
+    confirm = driver_wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='Not now']"))).click()
+
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    tweets = soup.find_all(attrs={"data-testid": "tweetText"})
+
+    tweet_texts = [tweet.get_text() for tweet in tweets[:count]]
+    driver.quit()
+
+    return tweet_texts
+
+
+@bot.command()
+async def tweets(ctx, username: str):
+    tweet_texts = get_latest_tweets(username)
+    for tweet_text in tweet_texts:
+        await ctx.send(tweet_text)
