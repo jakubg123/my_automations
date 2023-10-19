@@ -9,7 +9,8 @@ from dataclasses import dataclass
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from bs4 import BeautifulSoup
-
+from pytube import YouTube
+import os
 
 def get_spotify_links(id):
     chrome_options = Options()
@@ -61,13 +62,6 @@ def get_spotify_links(id):
         return spotify
 
 
-def browse_and_download(dict):
-    driver = webdriver.Chrome()
-    for song, authors in dict.items():
-        search = f"{song} {' '.join(authors)}"
-        driver.get(search)
-
-
 
 def search_google(query):
 
@@ -100,12 +94,25 @@ def search_google(query):
     finally:
         driver.quit()
 
-dict = get_spotify_links('2A03IwV2MWMitDMlIGsGIN')
 
+
+def download_youtube_audio(url):
+    yt = YouTube(url)
+    audio_stream = yt.streams.filter(only_audio=True, file_extension="mp4").first()
+    audio_stream.download(output_path=os.getcwd())
+
+
+dict = get_spotify_links('2A03IwV2MWMitDMlIGsGIN')
+youtube_links = [] 
 for song, authors in dict.items():
     print(f"{song} {authors}")
     query = f"{song} {' '.join(authors)}"
-    print(search_google(query))
+    youtube_links.append(search_google(query))
+
+for object in youtube_links:
+    download_youtube_audio(object)
+
+
 
 
 
