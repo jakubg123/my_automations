@@ -8,7 +8,6 @@ load_dotenv()
 
 DISCORD_API_SECRET = os.getenv("DISCORD_TOKEN")
 DISCORD_CHANNEL = os.getenv("DISCORD_CHANNEL")
-DISCORD_SPEAK_CHANNEL = os.getenv("DISCORD_SPEAK_CHANNEL")
 
 LOGGING_CONFIG = {
     "version": 1, 

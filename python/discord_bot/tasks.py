@@ -1,5 +1,6 @@
 import discord
 from discord.ext import tasks, commands
+from time import sleep
 import asyncio
 import datetime
 import settings
@@ -132,3 +133,4 @@ async def tweets(ctx, username: str):
     tweet_texts = get_latest_tweets(username)
     for tweet_text in tweet_texts:
         await ctx.send(tweet_text)
+
