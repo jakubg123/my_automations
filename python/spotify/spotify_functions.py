@@ -14,6 +14,7 @@ import os
 
 def get_spotify_links(id):
     chrome_options = Options()
+    chrome_options.add_argument("--headless=new")
 
     spotify = {
 
@@ -39,28 +40,27 @@ def get_spotify_links(id):
         elements = driver.find_elements(By.XPATH, '//div[@data-testid="tracklist-row"]')
 
         playlist_element = driver.find_element(By.ID, f'listrow-title-spotify:playlist:{id}')
-        playlist_name = playlist_element.find_element(By.CLASS_NAME, 'ListRowTitle__LineClamp-sc-1xe2if1-0')
-        playlist_text = playlist_name.text
+        playlist_name = playlist_element.find_element(By.CLASS_NAME, 'ListRowTitle__LineClamp-sc-1xe2if1-0').text
 
         count = len(elements)
-        for index, _ in enumerate(range(count), start=1):
-            element_title = driver.find_element("xpath",
-                                                f'//*[@id="main"]/div/div[2]/div[3]/div[1]/div[2]/div[2]/div/div/div[2]/main/div[1]/section/div[2]/div[3]/div[1]/div[2]/div[2]/div[{index}]/div/div[2]/div/a/div')
-            title = element_title.text
+        for index, _ in enumerate(range(count+1), start=2):
+            element_title = driver.find_element(By.CSS_SELECTOR, f"[aria-rowindex='{index}']")
+            title_element = element_title.find_element(By.CSS_SELECTOR, "a[data-testid='internal-track-link']")
+            title = title_element.text
+            
+            authors_element = element_title.find_element(By.CSS_SELECTOR, "span.Type__TypeElement-sc-goli3j-0.bDHxRN.rq2VQ5mb9SDAFWbBIUIn.standalone-ellipsis-one-line")
+            authors = authors_element.text
 
-            parent_element = driver.find_elements(By.XPATH,
-                                                  f'//*[@id="main"]/div/div[2]/div[3]/div[1]/div[2]/div[2]/div/div/div[2]/main/div[1]/section/div[2]/div[3]/div[1]/div[2]/div[2]/div[{index}]/div/div[2]/div/span')
+            time_element = element_title.find_element(By.CSS_SELECTOR, "div.Type__TypeElement-sc-goli3j-0.bDHxRN.Btg2qHSuepFGBG6X0yEN")
+            time = time_element.text
 
-            element_author = parent_element[0]
-            author_elements = element_author.find_elements(By.TAG_NAME, 'a')
-
-            authors = [author.text for author in author_elements]
+            print(f"{title} {authors} {time}")
 
             spotify[title] = authors
 
         driver.quit()
 
-        return spotify, playlist_text
+        return spotify, playlist_name 
 
 
 def search_google(query):

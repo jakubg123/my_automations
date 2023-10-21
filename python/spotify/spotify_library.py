@@ -9,13 +9,14 @@ if __name__ == '__main__':
     format='video/mp4'
 
     spotify_titles ,playlist = get_spotify_links(SPOTIFY_ID) # my spotify channel id
+
     youtube_links = [] 
 
     for song, authors in spotify_titles.items():
         print(f"{song} {authors}")
         query = f"{song} {' '.join(authors)}"
         youtube_links.append(search_google(query))
-
+#
     for url in youtube_links:
         title = download_youtube_audio(url,playlist)
         upload_file(f'{playlist}/{title}', format ,google_drive_directory)
