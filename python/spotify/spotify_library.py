@@ -17,8 +17,8 @@ if __name__ == '__main__':
         youtube_links.append(search_google(query))
 
     for url in youtube_links:
-        download_youtube_audio(url,playlist)
-        upload_file(f'{playlist}', format ,google_drive_directory)
+        title = download_youtube_audio(url,playlist)
+        upload_file(f'{playlist}/{title}', format ,google_drive_directory)
 
 
 

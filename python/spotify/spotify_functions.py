@@ -1,5 +1,5 @@
 import datetime
-from spotify_settings import EMAIL, PASSWORD, SPOTIFY_ID 
+from spotify_settings import EMAIL, PASSWORD, SPOTIFY_ID
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -10,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from bs4 import BeautifulSoup
 from pytube import YouTube
 import os
+
 
 def get_spotify_links(id):
     chrome_options = Options()
@@ -41,7 +42,6 @@ def get_spotify_links(id):
         playlist_name = playlist_element.find_element(By.CLASS_NAME, 'ListRowTitle__LineClamp-sc-1xe2if1-0')
         playlist_text = playlist_name.text
 
-
         count = len(elements)
         for index, _ in enumerate(range(count), start=1):
             element_title = driver.find_element("xpath",
@@ -63,19 +63,18 @@ def get_spotify_links(id):
         return spotify, playlist_text
 
 
-
 def search_google(query):
-
     driver = webdriver.Chrome()
 
     try:
         driver.get("https://www.youtube.com")
         driver.implicitly_wait(10)
-        conf_button = driver.find_element(By.XPATH,'//*[@id="content"]/div[2]/div[6]/div[1]/ytd-button-renderer[2]/yt-button-shape/button/yt-touch-feedback-shape/div/div[2]')
+        conf_button = driver.find_element(By.XPATH,
+                                          '//*[@id="content"]/div[2]/div[6]/div[1]/ytd-button-renderer[2]/yt-button-shape/button/yt-touch-feedback-shape/div/div[2]')
         conf_button.click()
         sleep(3)
         driver.implicitly_wait(10)
-        search_field = driver.find_element(By.NAME,"search_query")
+        search_field = driver.find_element(By.NAME, "search_query")
         search_field.clear()
 
         search_field.send_keys(query)
@@ -87,7 +86,8 @@ def search_google(query):
             EC.presence_of_all_elements_located((By.ID, "video-title"))
         )
 
-        element = driver.find_element(By.XPATH, '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-search/div[1]/ytd-two-column-search-results-renderer/div/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-video-renderer[2]/div[1]/ytd-thumbnail/a')#thumbnail /html/body/ytd-app/div[1]/ytd-page-manager/ytd-search/div[1]/ytd-two-column-search-results-renderer/div/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-video-renderer[1]/div[1]/ytd-thumbnail/a
+        element = driver.find_element(By.XPATH,
+                                      '/html/body/ytd-app/div[1]/ytd-page-manager/ytd-search/div[1]/ytd-two-column-search-results-renderer/div/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-video-renderer[2]/div[1]/ytd-thumbnail/a')  # thumbnail /html/body/ytd-app/div[1]/ytd-page-manager/ytd-search/div[1]/ytd-two-column-search-results-renderer/div/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-video-renderer[1]/div[1]/ytd-thumbnail/a
         link = element.get_attribute('href')
 
         return link
@@ -97,20 +97,17 @@ def search_google(query):
         driver.quit()
 
 
-def download_youtube_audio(url,playlist):
+def download_youtube_audio(url, playlist):
     yt = YouTube(url)
+    result = yt.title.split('/')[0]
+    result = f"{result}.mp4"
+
     audio_stream = yt.streams.filter(only_audio=True, file_extension="mp4").first()
     output_directory = os.path.join(os.getcwd(), playlist)
 
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
-    output_file_path = os.path.join(output_directory, f"{yt.title}.mp4")
 
+    audio_stream.download(output_path=output_directory,filename=result)
 
-    if not os.path.exists(output_file_path):
-        audio_stream.download(output_path=output_directory)
-
-
-
-
-
+    return result
