@@ -1,5 +1,5 @@
 import datetime
-from spotify_settings import EMAIL, PASSWORD, DISCORD_ID
+from spotify_settings import EMAIL, PASSWORD, SPOTIFY_ID 
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -106,7 +106,11 @@ def download_youtube_audio(url,playlist):
         os.makedirs(output_directory)
     output_file_path = os.path.join(output_directory, f"{yt.title}.mp4")
 
+
     if not os.path.exists(output_file_path):
         audio_stream.download(output_path=output_directory)
+
+
+
 
 
