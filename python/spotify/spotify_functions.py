@@ -12,38 +12,43 @@ from pytube import YouTube
 import os
 
 
-def get_spotify_links(id):
+def initialize_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("headless=new")
+    return webdriver.Chrome(options=chrome_options)
 
-    spotify = {
+def login_to_spotify(driver, email, password):
+    driver.get("https://accounts.spotify.com/en/login?continue")
 
-    }
+    email_elem = driver.find_element(By.XPATH, '//*[@id="login-username"]')
+    email_elem.send_keys(email)
+    password_elem = driver.find_element(By.XPATH, '//*[@id="login-password"]')
+    password_elem.send_keys(password)
 
-    with webdriver.Chrome(options=chrome_options) as driver:
-        driver.get("https://accounts.spotify.com/en/login?continue")
+    login_button = driver.find_element(By.XPATH, '//span[text()="Log In"]/..')
+    login_button.click()
+    driver.implicitly_wait(10)
+    account_overview_button = driver.find_element(By.XPATH, '//*[@id="account-settings-link"]/span[1]')
+    account_overview_button.click()
 
-        email_elem = driver.find_element(By.XPATH, '//*[@id="login-username"]')
-        email_elem.send_keys(EMAIL)
-        password_elem = driver.find_element(By.XPATH, '//*[@id="login-password"]')
-        password_elem.send_keys(PASSWORD)
-
-        login_button = driver.find_element(By.XPATH, '//span[text()="Log In"]/..')
-        login_button.click()
-
-        driver.implicitly_wait(10)
-        account_overview_button = driver.find_element(By.XPATH, '//*[@id="account-settings-link"]/span[1]')
-        account_overview_button.click()
-        driver.implicitly_wait(10)
-
-        driver.get(f"https://open.spotify.com/playlist/{id}")
-        elements = driver.find_elements(By.XPATH, '//div[@data-testid="tracklist-row"]')
-
+def get_playlist_details(driver, id):
+    driver.get(f"https://open.spotify.com/playlist/{id}")
+    elements = driver.find_elements(By.XPATH, '//div[@data-testid="tracklist-row"]')
+    try:
         playlist_element = driver.find_element(By.ID, f'listrow-title-spotify:playlist:{id}')
         playlist_name = playlist_element.find_element(By.CLASS_NAME, 'ListRowTitle__LineClamp-sc-1xe2if1-0').text
+    except:
+        playlist_name = None
 
-        count = len(elements)
-        for index, _ in enumerate(range(count+1), start=2):
+    return playlist_name, elements
+
+def extract_playlist_data(driver, elements):
+    count = len(elements)
+    
+    spotify = {}
+    
+    for index, _ in enumerate(range(count+1), start=2):
+        try:
             element_title = driver.find_element(By.CSS_SELECTOR, f"[aria-rowindex='{index}']")
             title_element = element_title.find_element(By.CSS_SELECTOR, "a[data-testid='internal-track-link']")
             title = title_element.text
@@ -57,14 +62,26 @@ def get_spotify_links(id):
             print(f"{title} {authors} {time}")
 
             spotify[title] = authors
+        except Exception as e:
+            print(f"Index: {index} Error: {e}")
+            
+    return spotify
 
+
+def get_spotify_links(id):
+    driver = initialize_driver()
+    spotify = {}
+
+    with driver:
+        login_to_spotify(driver, EMAIL, PASSWORD)
+        playlist_name, elements = get_playlist_details(driver,SPOTIFY_ID)
+        spotify = extract_playlist_data(driver, elements)
         driver.quit()
 
-        return spotify, playlist_name 
-
+    return spotify, playlist_name 
 
 def search_google(query):
-    driver = webdriver.Chrome()
+    driver = initialize_driver()
 
     try:
         driver.get("https://www.youtube.com")
