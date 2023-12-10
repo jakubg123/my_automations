@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/nofluff.iml" filepath="$PROJECT_DIR$/.idea/nofluff.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/bsoup.iml" filepath="$PROJECT_DIR$/.idea/bsoup.iml" />
     </modules>
   </component>
 </project>
